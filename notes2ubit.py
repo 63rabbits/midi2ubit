@@ -5,7 +5,8 @@ import read_midi as rmidi
 
 UBIT_NOTES = "c#d#ef#g#a#b"
 UBIT_RESOLUTION_MAG = 8         # resolution magnification
-UBIT_INSTRUCTION_PREFIX = 'sound = nerds.stringToNoteArray("'
+UBIT_INSTRUCTION_PREFIX = 'let sound: string[] = []\n' + \
+                          'sound = nerds.stringToNoteArray("'
 UBIT_INSTRUCTION_SUFFIX = '")\nnerds.playNoteArray(sound, MelodyOptions.Once)\n'
 
 
@@ -70,6 +71,7 @@ def to_ubit(notes, ubitfile, comments='', timebase=480, tempo=500000):
 
                     # for 1st rest
                     if len(q) <= 0:
+                        delta_time = delta_time * 4 * UBIT_RESOLUTION_MAG // timebase
                         code = get_notecode_on_ubit(0, 0, delta_time, timebase)
 
                     # convert midi-notes to ubit-notes
@@ -86,7 +88,6 @@ def to_ubit(notes, ubitfile, comments='', timebase=480, tempo=500000):
 
                     q.clear()
                     q.append(element)
-
 
             # unknown
             else:
