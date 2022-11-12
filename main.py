@@ -1,7 +1,9 @@
 # # make App
+# pip install pyinstaller
+# pip install pillow
 # pip install tkinterdnd2
-# pyinstaller main.py --name midi2ubit --onefile --noconsole --collect-data tkinterdnd2 --add-data="./resources/*;./resources" --icon="./resources/icon.ico"  # for windows
-# pyinstaller main.py --name midi2ubit --onefile --noconsole --collect-data tkinterdnd2 --add-data="./resources/*:./resources" --icon="./resources/icon.icns" # for mac
+# pyinstaller main.py --name midi2ubit --onefile --noconsole --collect-data tkinterdnd2 --collect-data chardet --add-data="./resources/*;./resources" --icon="./resources/icon.ico"  # for windows
+# pyinstaller main.py --name midi2ubit --onefile --noconsole --collect-data tkinterdnd2 --collect-data chardet --add-data="./resources/*:./resources" --icon="./resources/icon.icns" # for mac
 
 
 from tkinter import *

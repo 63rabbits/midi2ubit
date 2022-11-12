@@ -1,4 +1,6 @@
 import os
+# pip install chardet
+from chardet import detect
 
 
 MIDI_LEN = 4
@@ -63,6 +65,14 @@ def read_variable_length_value(file):
             return v, ''
 
     return -2, "too long. Max length exceeded."
+
+
+def auto_decode(code):
+    enc = detect(code)
+    text = code
+    if not enc['encoding'] is None:
+        text = code.decode(errors='backslashreplace', encoding=enc['encoding']).replace('\x00', '')
+    return text
 
 
 def get_data(file):
@@ -189,48 +199,39 @@ def get_data(file):
 
                     # text
                     elif meta_type == 0x01:
-                        text = read_buffer.decode(errors='backslashreplace').replace('\x00', '')
-                        midi_info[f'TRACK-{track_no} ' + MIDI_META_TEXT] = text
+                        midi_info[f'TRACK-{track_no} ' + MIDI_META_TEXT] = auto_decode(read_buffer)
 
                     # copyright
                     elif meta_type == 0x02:
-                        text = read_buffer.decode(errors='backslashreplace').replace('\x00', '')
-                        midi_info[f'TRACK-{track_no} ' + MIDI_META_COPYRIGHT] = text
+                        midi_info[f'TRACK-{track_no} ' + MIDI_META_COPYRIGHT] = auto_decode(read_buffer)
 
                     # track name
                     elif meta_type == 0x03:
-                        text = read_buffer.decode(errors='backslashreplace').replace('\x00', '')
-                        midi_info[f'TRACK-{track_no} ' + MIDI_META_TRACK_NAME] = text
+                        midi_info[f'TRACK-{track_no} ' + MIDI_META_TRACK_NAME] = auto_decode(read_buffer)
 
                     # instrument name
                     elif meta_type == 0x04:
-                        text = read_buffer.decode(errors='backslashreplace').replace('\x00', '')
-                        midi_info[f'TRACK-{track_no} ' + MIDI_META_INSTRUMENT_NAME] = text
+                        midi_info[f'TRACK-{track_no} ' + MIDI_META_INSTRUMENT_NAME] = auto_decode(read_buffer)
 
                     # lyrics
                     elif meta_type == 0x05:
-                        text = read_buffer.decode(errors='backslashreplace').replace('\x00', '')
-                        midi_info[f'TRACK-{track_no} ' + MIDI_META_LYRICS] = text
+                        midi_info[f'TRACK-{track_no} ' + MIDI_META_LYRICS] = auto_decode(read_buffer)
 
                     # marker
                     elif meta_type == 0x06:
-                        text = read_buffer.decode(errors='backslashreplace').replace('\x00', '')
-                        midi_info[f'TRACK-{track_no} ' + MIDI_META_MARKER] = text
+                        midi_info[f'TRACK-{track_no} ' + MIDI_META_MARKER] = auto_decode(read_buffer)
 
                     # queue point
                     elif meta_type == 0x07:
-                        text = read_buffer.decode(errors='backslashreplace').replace('\x00', '')
-                        midi_info[f'TRACK-{track_no} ' + MIDI_META_QUEUE_POINT] = text
+                        midi_info[f'TRACK-{track_no} ' + MIDI_META_QUEUE_POINT] = auto_decode(read_buffer)
 
                     # program name (timbre)
                     elif meta_type == 0x08:
-                        text = read_buffer.decode(errors='backslashreplace').replace('\x00', '')
-                        midi_info[f'TRACK-{track_no} ' + MIDI_META_PROGRAM_NAME] = text
+                        midi_info[f'TRACK-{track_no} ' + MIDI_META_PROGRAM_NAME] = auto_decode(read_buffer)
 
                     # device name
                     elif meta_type == 0x09:
-                        text = read_buffer.decode(errors='backslashreplace').replace('\x00', '')
-                        midi_info[f'TRACK-{track_no} ' + MIDI_META_DEVICE_NAME] = text
+                        midi_info[f'TRACK-{track_no} ' + MIDI_META_DEVICE_NAME] = auto_decode(read_buffer)
 
                     # MIDI channel prefix
                     elif meta_type == 0x20:
