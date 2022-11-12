@@ -10,7 +10,7 @@ The micro:bit only plays one note at a time, so it can't play chords. midi2ubit 
 
 ## Example of use
 
-[midi2ubit_usageexample](https://github.com/63rabbits/midi2ubit_usageexample)
+[midi2ubit_usageexsample](https://github.com/63rabbits/midi2ubit_usageexsample)
 
 
 ## Outline
