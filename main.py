@@ -4,6 +4,7 @@
 # pip install tkinterdnd2
 # pyinstaller main.py --name midi2ubit --onefile --noconsole --collect-data tkinterdnd2 --collect-data chardet --add-data="./resources/*;./resources" --icon="./resources/icon.ico"  # for windows
 # pyinstaller main.py --name midi2ubit --onefile --noconsole --collect-data tkinterdnd2 --collect-data chardet --add-data="./resources/*:./resources" --icon="./resources/icon.icns" # for mac
+# [!] If you get a "No module named ..." error at runtime, reinstall pyinstaller and the target module.
 
 
 from tkinter import *
