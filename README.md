@@ -12,6 +12,7 @@ The micro:bit only plays one note at a time, so it can't play chords. midi2ubit 
 
 [midi2ubit_usageexsample](https://github.com/63rabbits/midi2ubit_usageexsample)
 
+[!] The file size is too big to download to micro:bit. To be improved.
 
 ## Outline
 
