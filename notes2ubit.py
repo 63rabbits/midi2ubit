@@ -2,7 +2,7 @@
 from collections import deque
 import read_midi as rmidi
 
-
+UBIT_MIN_TIME = 1
 UBIT_NOTES = "c#d#ef#g#a#b"
 UBIT_RESOLUTION_MAG = 8         # resolution magnification
 UBIT_INSTRUCTION_PREFIX = 'let sound: string[] = []\n' + \
@@ -19,35 +19,31 @@ def note2code(note):
     return f'{pitch_name}{octave}'
 
 
-def get_notecode_on_ubit(note, velocity, deltatime, timebase):
-    code = ''
-    if velocity > 0:
-        notecode = note2code(note)
-        code = f'{notecode}:{deltatime}'
-    else:
-        code = f'r:{deltatime}'
-    return code
+def get_notecode_on_ubit(note, velocity, deltatime):
+    if velocity <= 0:
+        return f'r:{deltatime}'
+
+    code = note2code(note)
+    return f'{code}:{deltatime}'
 
 
-def to_ubit(notes, ubitfile, comments='', timebase=480, tempo=500000):
+def to_ubit(notes, ubitfile, comments='', timebase=480, tempo=500000, beatdenom=4):
 
     # if os.path.exists(file):
     #     return -1, f'Output file already exists. path = {file}'
 
     q = deque()
-    # with open(file, 'w') as ubit:
     with open(ubitfile, 'a') as ubit:
 
         # utf8comments = comments.decode('UTF-8', 'ignore')
         # utf8comments = comments.encode(encoding='utf-8', errors='replace')
         # if len(comments) > 0: ubit.write(utf8comments)
         if len(comments) > 0: ubit.write(comments)
-        ubit.write(f'music.setTempo({60 * 1000000 / tempo * UBIT_RESOLUTION_MAG :.0f})\n')
+        ubit.write(f'music.setTempo({60 * 1000000 * beatdenom / 4 / tempo * UBIT_RESOLUTION_MAG :.0f})\n')
         ubit.write(UBIT_INSTRUCTION_PREFIX)
 
         separator = ''
         delta_time = 0
-        default_time = 0
         for element in notes:
 
             # delta time
@@ -69,21 +65,17 @@ def to_ubit(notes, ubitfile, comments='', timebase=480, tempo=500000):
                         q.append(element)
                         continue
 
-                    # for 1st rest
-                    if len(q) <= 0:
-                        delta_time = delta_time * 4 * UBIT_RESOLUTION_MAG // timebase
-                        code = get_notecode_on_ubit(0, 0, delta_time, timebase)
-
-                    # convert midi-notes to ubit-notes
-                    else:
+                    note = 0
+                    velocity = 0
+                    while len(q) > 0:
                         (event, ch, note, velocity) = q.popleft()
-                        delta_time = delta_time * 4 * UBIT_RESOLUTION_MAG // timebase
-                        if delta_time <= 0: delta_time = default_time
-                        code = get_notecode_on_ubit(note, velocity, delta_time, timebase)
+                        if velocity > 0: break
 
+                    delta = delta_time * 4 * UBIT_RESOLUTION_MAG // timebase
+                    if delta <= 0: delta = UBIT_MIN_TIME
+                    code = get_notecode_on_ubit(note, velocity, delta)
                     ubit.write(separator + code)
                     delta_time = 0
-                    default_time = 1
                     separator = ','
 
                     q.clear()
@@ -97,9 +89,9 @@ def to_ubit(notes, ubitfile, comments='', timebase=480, tempo=500000):
         if len(q) > 0:
             # convert midi-notes to ubit-notes
             (event, ch, note, velocity) = q.popleft()
-            delta_time = delta_time * 4 * UBIT_RESOLUTION_MAG // timebase
-            if delta_time <= 0: delta_time = default_time
-            code = get_notecode_on_ubit(note, velocity, delta_time, timebase)
+            delta = delta_time * 4 * UBIT_RESOLUTION_MAG // timebase
+            if delta <= 0: delta = UBIT_MIN_TIME
+            code = get_notecode_on_ubit(note, velocity, delta)
             ubit.write(separator + code)
 
         ubit.write(UBIT_INSTRUCTION_SUFFIX)

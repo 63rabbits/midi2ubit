@@ -18,6 +18,7 @@ import notes2ubit as ubit
 
 # JST = datetime.timezone(datetime.timedelta(hours=9), 'JST')
 DEFALUT_TEMPO = 480
+DEFAULT_LOW_BEAT = 4
 
 
 def put_message(message, op='APPEND'):
@@ -44,6 +45,7 @@ def dnd_handler(event):
             put_message(f'{key} = {midi_info[key]}\n')
 
         tempo = DEFALUT_TEMPO
+        lowbeat = DEFAULT_LOW_BEAT
         for index in range(midi_info[rmidi.MIDI_HEADER_NUMBER_OF_TRACKS]):
 
             # now = datetime.datetime.now(UBIT_JST)
@@ -55,12 +57,17 @@ def dnd_handler(event):
             if key in midi_info:
                 tempo = midi_info[key]
 
+            key = f'TRACK-{index} {rmidi.MIDI_META_BEAT}'
+            if key in midi_info:
+                lowbeat = 2 ** midi_info[key][1]    # denominator of the time signature
+
             notes = ubit.to_ubit(
                 notes=midi_info[f'TRACK-{index} {rmidi.MIDI_EVENTS}'],
                 ubitfile=midi_info['file'] + '.txt',
                 comments=comments,
                 timebase=midi_info[rmidi.MIDI_HEADER_TIME_BASE],
-                tempo=tempo
+                tempo=tempo,
+                beatdenom=lowbeat
             )
             if notes[0] >= 0:
                 put_message(f'TRACK-{index} {notes[1]}\n')
